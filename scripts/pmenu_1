@@ -1,0 +1,11 @@
+
+#!/bin/bash
+
+## Created By Aditya Shakya
+
+MENU="$(rofi -sep "|" -dmenu -p 'System' -line-padding 4 -font "Source Code Pro 16" <<< "🔒 Lock|↻ Reboot|⏻ Shutdown")"
+            case "$MENU" in
+                *Lock) i3lock-fancy ;;
+                *Reboot) systemctl reboot ;;
+                *Shutdown) systemctl -i poweroff
+            esac

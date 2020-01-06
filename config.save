@@ -19,23 +19,23 @@ trans = #00000000
 white = #FFFFFF
 black = #000000
 
-bg = #000000
+bg = #1F1F1F
 fg = #FFFFFF
-fg-alt = #444444
+fg-alt = #A9ABB0
 
 acolor = #FFFFFF
 curgent = #EF5350
 coccupied = #42A5F5
 
-shade1 = #111111
-shade2 = #222222
-shade3 = #333333
-shade4 = #444444
-shade5 = #555555
-shade6 = #666666
-shade7 = #777777
-shade8 = #888888
-shade9 = #999999
+shade1 = #1A237E
+shade2 = #283593
+shade3 = #303F9F
+shade4 = #3949AB
+shade5 = #3F51B5
+shade6 = #5C6BC0
+shade7 = #7986CB
+shade8 = #9FA8DA
+ashade8 = #2C2C2C
 
 ## Material Colors
 
@@ -58,7 +58,6 @@ deep-orange = #f4511e
 brown = #6d4c41
 grey = #757575
 blue-gray = #546e7a
-
 
 ;==========================================================
 
@@ -90,9 +89,19 @@ scroll-down = i3wm-wsprev
 ;== Module Location ========================================================
 
 modules-left = workspaces google github
-modules-right = cpu memory volume battery network date powermenu
+modules-right = cpu memory temperature backlight volume battery network date powermenu
  
 ;== Modules ========================================================
+
+[module/arch]
+type = custom/text
+content = 
+;alt icons = 
+content-padding = 2
+content-background = ${color.shade1}
+content-foreground = ${color.fg}
+click-left = rmenu_1
+click-right = rmenu_wi_1
 
 [module/workspaces]
 type = internal/xworkspaces
@@ -135,14 +144,14 @@ label-occupied-foreground = ${color.coccupied}
 type = custom/text
 content = 
 content-padding = 2
-content-foreground = ${color.shade7}
+content-foreground = ${color.fg}
 click-left = xdg-open https://www.google.com/ 
 
 [module/github]
 type = custom/text
 content = 
 content-padding = 2
-content-foreground = ${color.shade7}
+content-foreground = ${color.fg}
 click-left = xdg-open https://www.github.com/ 
 
 [module/reddit]
@@ -185,6 +194,13 @@ label-song-ellipsis = true
 
 ;==========================================================
 
+[module/pkg]
+type = custom/script
+exec = ~/.config/polybar/scripts/updates.sh
+format-background = ${color.shade7}
+format-padding = 2
+tail = true
+
 [module/battery]
 type = internal/battery
 full-at = 100
@@ -192,11 +208,11 @@ time-format = %H:%M
 battery = BAT0
 adapter = AC
 format-charging = <animation-charging> <label-charging>
-format-charging-background = ${color.shade4}
+format-charging-background = ${color.shade5}
 format-charging-padding = 2
 label-charging = %percentage%%
 format-discharging = <ramp-capacity> <label-discharging>
-format-discharging-background = ${color.shade4}
+format-discharging-background = ${color.shade5}
 format-discharging-padding = 2
 label-discharging = %percentage%%
 format-full = <label-full>
@@ -232,10 +248,10 @@ animation-charging-framerate = 750
 type = internal/alsa
 format-volume = <ramp-volume> <label-volume>
 format-volume-padding = 2
-format-volume-background = ${color.shade5}
+format-volume-background = ${color.shade6}
 label-volume = %percentage%%
 label-muted = "婢"
-label-muted-background = ${color.shade5}
+label-muted-background = ${color.shade6}
 label-muted-padding = 2
 
 ramp-volume-0 = 奄
@@ -249,10 +265,9 @@ ramp-volume-6 = 墳
 [module/network]
 type = custom/script
 exec = ~/.config/polybar/scripts/check-network
-format-background = ${color.shade3}
+format-background = ${color.shade4}
 format-padding = 2
 click-left = networkmanager_dmenu &
-click-right = networkmanager_dmenu &
 tail = true
 
 [module/date]
@@ -260,7 +275,7 @@ type = internal/date
 interval = 30
 label =  %time%
 label-padding = 2
-label-background = ${color.shade2}
+label-background = ${color.shade3}
 time =  %I:%M %p
 time-alt =  %Y-%m-%d
 
@@ -268,9 +283,88 @@ time-alt =  %Y-%m-%d
 type = custom/text
 content = 襤
 content-padding = 2
-content-background = ${color.shade1}
+content-background = ${color.shade2}
 content-foreground = ${color.fg}
 click-left = ~/.config/polybar/scripts/pmenu_1
+;click-right = ~/.config/polybar/scripts/pmenu_1
+
+[module/backlight]
+type = internal/backlight
+
+; Use the following command to list available cards:
+; $ ls -1 /sys/class/backlight/
+card = amdgpu_bl0
+
+ramp-0 = 🌕
+ramp-1 = 🌔
+ramp-2 = 🌓
+ramp-3 = 🌒
+ramp-4 = 🌑
+
+
+[module/temperature]
+type = internal/temperature
+
+; Seconds to sleep between updates
+; Default: 1
+interval = 5
+
+; Thermal zone to use
+; To list all the zone types, run 
+; $ for i in /sys/class/thermal/thermal_zone*; do echo "$i: $(<$i/type)"; done
+; Default: 0
+thermal-zone = 0
+
+; Full path of temperature sysfs path
+; Use `sensors` to find preferred temperature source, then run
+; $ for i in /sys/class/hwmon/hwmon*/temp*_input; do echo "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*})) $(readlink -f $i)"; done
+; to find path to desired file
+; Default reverts to thermal zone setting
+hwmon-path = /sys/devices/pci0000:00/0000:00:18.3/hwmon/hwmon3/temp1_input
+
+; Base temperature for where to start the ramp (in degrees celsius)
+; Default: 0
+base-temperature = 20
+
+; Threshold temperature to display warning label (in degrees celsius)
+; Default: 80
+warn-temperature = 70
+
+; Whether or not to show units next to the temperature tokens (°C, °F)
+; Default: true
+;units = false
+
+; Available tags:
+;   <label> (default)
+;   <ramp>
+;format = <ramp>
+
+; Available tags:
+;   <label-warn> (default)
+;   <ramp>
+;format-warn = <ramp> <label-warn>
+
+; Available tokens:
+;   %temperature% (deprecated)
+;   %temperature-c%   (default, temperature in °C)
+;   %temperature-f%   (temperature in °F)
+label = TEMP %temperature-c%
+
+; Available tokens:
+;   %temperature% (deprecated)
+;   %temperature-c%   (default, temperature in °C)
+;   %temperature-f%   (temperature in °F)
+label-warn = TEMP %temperature-c%
+label-warn-foreground = #f00
+
+; Requires the <ramp> tag
+; The icon selection will range from `base-temperature` to `warn-temperature`,
+; temperatures above `warn-temperature` will use the last icon
+; and temperatures below `base-temperature` will use `ramp-0`
+ramp-0 = A
+ramp-1 = B
+ramp-2 = C
+ramp-foreground = #55
 
 
 [module/memory]
@@ -278,7 +372,7 @@ type = internal/memory
 
 ; Seconds to sleep between updates
 ; Default: 1
-interval = 1
+; interval = 3
 
 ; Available tags:
 ;   <label> (default)
@@ -290,12 +384,7 @@ interval = 1
 ;   <bar-swap-free>
 ;   <ramp-swap-used>
 ;   <ramp-swap-free>
-;format = <label> <ramp-used> 
-format = <bar-used>
-format-background = ${color.shade6}
-format-foreground = ${color.fg}
-format-padding = 2
-
+format = <label> <bar-used>
 
 ; Available tokens:
 ;   %percentage_used% (default)
@@ -315,11 +404,11 @@ format-padding = 2
 ;   %gb_swap_free%
 ;   %gb_swap_used%
 
-;label = %gb_used%/%gb_total%
+label = RAM %gb_used%/%gb_free%
 
 ; Only applies if <bar-used> is used
 bar-used-indicator =
-bar-used-width = 20
+bar-used-width = 50
 bar-used-foreground-0 = #55aa55
 bar-used-foreground-1 = #557755
 bar-used-foreground-2 = #f5a70a
@@ -353,25 +442,21 @@ type = internal/cpu
 
 ; Seconds to sleep between updates
 ; Default: 1
-interval = 1
+interval = 0.5
 
 ; Available tags:
 ;   <label> (default)
 ;   <bar-load>
 ;   <ramp-load>
 ;   <ramp-coreload>
-format = <ramp-coreload>
-
-format-background = ${color.shade7}
-format-foreground = ${color.fg}
-format-padding = 2
+format = <label> <ramp-coreload>
 
 ; Available tokens:
 ;   %percentage% (default) - total cpu load averaged over all cores
 ;   %percentage-sum% - Cumulative load on all cores
 ;   %percentage-cores% - load percentage for each core
 ;   %percentage-core[1-9]% - load percentage for specific core
-label = %percentage%%
+label = CPU %percentage%%
 
 ; Spacing between individual per-core ramps
 ramp-coreload-spacing = 1
@@ -383,6 +468,7 @@ ramp-coreload-4 = ▅
 ramp-coreload-5 = ▆
 ramp-coreload-6 = ▇
 ramp-coreload-7 = █
+
 
 ;== EOF ========================================================
 
